@@ -6,14 +6,22 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 import os
+import chromedriver_autoinstaller
 
 app = Flask(__name__)
 
 # Função para buscar os produtos
 def search_product(product_name):
 
+    # Instalar e verificar a versão do chromedriver
+    chromedriver_autoinstaller.install()
+
     # Configuração para rodar o Chrome sem interface (opcional)
     chrome_options = Options()
+    chrome_options.add_argument('--headless')  # Rodar sem interface gráfica
+    chrome_options.add_argument('--disable-gpu')  # Desabilitar o uso da GPU (necessário em alguns ambientes)
+    chrome_options.add_argument('--no-sandbox')  # Necessário em ambientes de container como o Render
+    chrome_options.add_argument('--disable-dev-shm-usage')  # Necessário em alguns ambientes com Docker
     
     # Iniciar o navegador
     browser = webdriver.Chrome(options=chrome_options)
