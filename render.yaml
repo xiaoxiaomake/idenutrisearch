@@ -2,3 +2,11 @@ build:
   dockerfile: Dockerfile
   environment:
     - INSTALL_CHROME=true
+
+services:
+  - type: web
+    name: flask-app
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    dockerfilePath: Dockerfile
