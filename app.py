@@ -5,69 +5,54 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
 import os
 
 app = Flask(__name__)
 
 # Função para buscar os produtos
 def search_product(product_name):
-    try:
-        # Configuração para rodar o Chrome sem interface (opcional)
-        chrome_options = Options()
-        chrome_options.add_argument('--headless')  # Rodar sem interface gráfica
-        chrome_options.add_argument('--disable-gpu')  # Desabilitar o uso da GPU
-        chrome_options.add_argument('--no-sandbox')  # Necessário em ambientes de container como o Render
-        chrome_options.add_argument('--disable-dev-shm-usage')  # Necessário em alguns ambientes com Docker
 
-        # Caminho do Chrome no Render (ajuste conforme necessário)
-        chrome_binary_path = os.getenv("CHROME_BIN", "/opt/render/project/.render/chrome/opt/google/chrome/chrome")
-        chrome_options.binary_location = chrome_binary_path
+    # Configuração para rodar o Chrome sem interface (opcional)
+    chrome_options = Options()
+    
+    # Iniciar o navegador
+    browser = webdriver.Chrome(options=chrome_options)
 
-        # Instalar e configurar o chromedriver automaticamente
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+    # Ir para a página inicial
+    website = "https://www.klikindomaret.com/"
+    browser.get(website)
 
-        # Ir para a página inicial
-        website = "https://www.klikindomaret.com/"
-        driver.get(website)
+    # Esperar até o campo de pesquisa estar visível e interagir com ele
+    search_box = WebDriverWait(browser, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//input[@id='searchids']"))
+    )
+    search_box.send_keys(product_name)
+    search_box.send_keys(Keys.RETURN)
 
-        # Esperar até o campo de pesquisa estar visível e interagir com ele
-        search_box = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//input[@id='searchids']"))
-        )
-        search_box.send_keys(product_name)
-        search_box.send_keys(Keys.RETURN)
+    # Esperar até que os resultados sejam carregados (aguarda a presença dos produtos)
+    WebDriverWait(browser, 10).until(
+        EC.presence_of_all_elements_located((By.XPATH, "//div[@class='wrp-content']//div[@class='title']"))
+    )
 
-        # Esperar até que os resultados sejam carregados
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.XPATH, "//div[@class='wrp-content']//div[@class='title']"))
-        )
+    # Encontrar os produtos, preços e imagens
+    products = browser.find_elements(By.XPATH, "//div[@class='wrp-content']//div[@class='title']")
+    prices = browser.find_elements(By.XPATH, "//span[@class='normal price-value']")
+    images = browser.find_elements(By.XPATH, "//div[@class='wrp-media']//img[@class='lazy loaded']")
 
-        # Encontrar os produtos, preços e imagens
-        products = driver.find_elements(By.XPATH, "//div[@class='wrp-content']//div[@class='title']")
-        prices = driver.find_elements(By.XPATH, "//span[@class='normal price-value']")
-        images = driver.find_elements(By.XPATH, "//div[@class='wrp-media']//img[@class='lazy loaded']")
+    # Limitar aos 3 primeiros
+    results = []
+    for i in range(min(4, len(products))):
+        product_image = images[i].get_attribute('data-src') or images[i].get_attribute('src')
+        results.append({
+            "name": products[i].text,
+            "price": prices[i].text,
+            "image": product_image
+        })
 
-        # Limitar aos 3 primeiros
-        results = []
-        for i in range(min(4, len(products))):
-            product_image = images[i].get_attribute('data-src') or images[i].get_attribute('src')
-            results.append({
-                "name": products[i].text,
-                "price": prices[i].text,
-                "image": product_image
-            })
+    # Fechar o navegador
+    browser.quit()
 
-        # Fechar o navegador
-        driver.quit()
-
-        return results
-
-    except Exception as e:
-        print(f"Erro ao buscar produto: {e}")
-        return []
+    return results
 
 # Página inicial
 @app.route('/', methods=['GET', 'POST'])

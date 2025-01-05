@@ -1,6 +1,0 @@
-build:
-  commands:
-    - bash render-build.sh
-
-start:
-  command: python app.py
