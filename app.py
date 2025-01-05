@@ -14,6 +14,13 @@ def search_product(product_name):
 
     # Configuração para rodar o Chrome sem interface (opcional)
     chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Executar sem interface gráfica
+    chrome_options.add_argument("--no-sandbox")  # Necessário para ambientes restritos
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Evita problemas com pouca memória compartilhada
+    chrome_options.add_argument("--disable-gpu")  # Desabilitar GPU (opcional, para headless)
+    chrome_options.add_argument("--disable-extensions")  # Desabilitar extensões
+    chrome_options.add_argument("--remote-debugging-port=9222")  # Habilitar debugging remoto
+    chrome_options.binary_location = "/opt/render/project/.render/chrome/opt/google/chrome/chrome"
     
     # Iniciar o navegador
     browser = webdriver.Chrome(options=chrome_options)
