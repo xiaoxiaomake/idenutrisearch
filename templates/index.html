@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Produto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            padding: 40px;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .search-bar input {
+            width: 60%;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            border: 2px solid #ddd;
+            transition: all 0.3s ease;
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: #2d8e92;
+        }
+        .search-bar button {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            background-color: #2d8e92;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+        .search-bar button:hover {
+            background-color: #24878a;
+        }
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+        .product {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+        }
+        .product:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        .product img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .product p {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .product .price {
+            font-size: 1.3em;
+            color: #2d8e92;
+            font-weight: bold;
+        }
+        .no-results {
+            text-align: center;
+            font-size: 1.2em;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Buscar Produtos</h1>
+        <form method="POST" class="search-bar">
+            <input type="text" name="product_name" placeholder="Digite o nome do produto" value="{{ product_name }}" required>
+            <button type="submit">Buscar</button>
+        </form>
+
+        {% if results %}
+            <h2 style="text-align: center;">Resultados para "{{ product_name }}":</h2>
+            <div class="results">
+                {% for product in results %}
+                    <div class="product">
+                        <img src="{{ product.image }}" alt="{{ product.name }}">
+                        <p>{{ product.name }}</p>
+                        <p class="price">{{ product.price }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% elif product_name %}
+            <p class="no-results">Nenhum produto encontrado para "{{ product_name }}".</p>
+        {% endif %}
+    </div>
+</body>
+</html>
