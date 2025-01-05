@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+import os
 
 app = Flask(__name__)
 
@@ -14,7 +15,6 @@ def search_product(product_name):
     # Configuração para rodar o Chrome sem interface (opcional)
     chrome_options = Options()
     
-
     # Iniciar o navegador
     browser = webdriver.Chrome(options=chrome_options)
 
@@ -63,5 +63,6 @@ def index():
         return render_template('index.html', results=results, product_name=product_name)
     return render_template('index.html', results=[], product_name='')
 
+# Configuração para rodar o app
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
