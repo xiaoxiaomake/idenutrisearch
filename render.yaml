@@ -1,12 +1,6 @@
 build:
-  dockerfile: Dockerfile
-  environment:
-    - INSTALL_CHROME=true
+  commands:
+    - bash render-build.sh
 
-services:
-  - type: web
-    name: flask-app
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python app.py"
-    dockerfilePath: Dockerfile
+start:
+  command: python app.py

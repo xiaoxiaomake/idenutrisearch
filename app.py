@@ -20,6 +20,7 @@ def search_product(product_name):
     chrome_options.add_argument('--disable-gpu')  # Desabilitar o uso da GPU (necessário em alguns ambientes)
     chrome_options.add_argument('--no-sandbox')  # Necessário em ambientes de container como o Render
     chrome_options.add_argument('--disable-dev-shm-usage')  # Necessário em alguns ambientes com Docker
+    chrome_options.binary_location = "/opt/render/project/.render/chrome/opt/google/chrome/chrome"  # Caminho do Chrome no Render
     
     # Instalar e configurar o chromedriver automaticamente
     service = Service(ChromeDriverManager().install())
